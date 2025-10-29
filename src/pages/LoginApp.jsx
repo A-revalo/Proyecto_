@@ -4,13 +4,14 @@ import { useNavigate } from "react-router-dom";
 
 function LoginApp() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [loginMessage, setLoginMessage] = useState("");
-  const [user, setUser] = useState(null); // ✅ Guardar usuario logueado
+  const [user, setUser] = useState(null);
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
   const validatePassword = (password) =>
@@ -19,7 +20,6 @@ function LoginApp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validar campos vacíos primero
     if (!email.trim()) {
       setEmailError(true);
       setLoginMessage("Por favor completa el campo de correo electrónico");
@@ -51,10 +51,9 @@ function LoginApp() {
 
       if (res.data.success) {
         const loggedUser = res.data.user;
-        setUser(loggedUser); // ✅ Guardar usuario logueado
+        setUser(loggedUser);
         setLoginMessage("");
 
-        // 🚀 Redirigir según el rol
         switch (loggedUser.rol) {
           case "ciudadano":
             navigate("/ciudadano");
@@ -77,6 +76,8 @@ function LoginApp() {
     }
   };
 
+  const toggleShowPassword = () => setShowPassword((prev) => !prev);
+
   return (
     <div id="loginForm" className="form-container p-6 max-w-md mx-auto bg-white shadow-lg rounded-lg mt-10">
       <div className="form-header text-center mb-6">
@@ -90,7 +91,6 @@ function LoginApp() {
         </div>
       )}
 
-      {/* ✅ Si el usuario está logueado, mostrar sus datos */}
       {user ? (
         <div className="bg-green-50 border border-green-400 rounded p-4 text-green-800">
           <h2 className="text-xl font-semibold mb-2">Datos del usuario</h2>
@@ -127,20 +127,61 @@ function LoginApp() {
             <label htmlFor="loginPassword" className="block font-medium mb-2">
               Contraseña
             </label>
-            <input
-              type="password"
-              id="loginPassword"
-              name="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={`w-full px-3 py-2 border rounded ${
-                passwordError ? "border-red-500" : "border-gray-300"
-              }`}
-            />
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                id="loginPassword"
+                name="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={`w-full px-3 py-2 border rounded 
+                  ${passwordError ? "border-red-500" : "border-gray-300"}
+                  focus:outline-none focus:ring-2 focus:ring-blue-200`}
+                style={{ paddingRight: '45px' }}
+              />
+              <button
+                type="button"
+                onClick={toggleShowPassword}
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#6b7280'
+                }}
+              >
+                <svg 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 24 24" 
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {showPassword ? (
+                    <>
+                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                    </>
+                  ) : (
+                    <>
+                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                      <path d="M4 4l16 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </>
+                  )}
+                </svg>
+              </button>
+            </div>
             <small className="text-gray-600 text-sm mt-1 block">
-              La contraseña debe tener mínimo 8 caracteres, incluir mayúscula,
-              número y símbolo.
+             
             </small>
             {passwordError && (
               <small id="passwordError" className="text-red-600 mt-1">
