@@ -14,10 +14,23 @@ function LoginApp() {
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
   const validatePassword = (password) =>
-    /^(?=.*[A-Z a-z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\$\$:;<>,.?~\\/-]).{8,}$/.test(password);
+    /^(?=.*[A-Z a-z])(?=.*\d)(?=.*[!@#$%^&*()_+{}$:;<>,.?~\\/-]).{8,}$/.test(password);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validar campos vacíos primero
+    if (!email.trim()) {
+      setEmailError(true);
+      setLoginMessage("Por favor completa el campo de correo electrónico");
+      return;
+    }
+
+    if (!password.trim()) {
+      setPasswordError(true);
+      setLoginMessage("Por favor completa el campo de contraseña");
+      return;
+    }
 
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
@@ -105,7 +118,7 @@ function LoginApp() {
             />
             {emailError && (
               <small id="emailError" className="text-red-600 mt-1">
-                Ingresa un correo válido
+                {!email.trim() ? "Este campo es obligatorio" : "Ingresa un correo válido"}
               </small>
             )}
           </div>
@@ -131,7 +144,7 @@ function LoginApp() {
             </small>
             {passwordError && (
               <small id="passwordError" className="text-red-600 mt-1">
-                La contraseña no cumple con los requisitos
+                {!password.trim() ? "Este campo es obligatorio" : "La contraseña no cumple con los requisitos"}
               </small>
             )}
           </div>
